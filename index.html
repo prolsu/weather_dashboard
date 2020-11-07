@@ -43,6 +43,7 @@
                 <div class="card-content">
                     <h1 class="title" id="currentDay"></h1>
                     <h1 class="subtitle is-4" id="currentTime"></h1>
+                    <div class="newCityName"></div>
                 </div>
                 <footer class="card-footer">
                     <!-- create divs and data with jQuery? -->
@@ -127,6 +128,14 @@
                 $(".warning").text("");
                 $(".modal").attr("style", "display: none;");
                 $("#cityValue").val("");
+                // creates new button element with the city as value
+                var cityNewElement = $("<h1 class='city button column is-light' style='margin-bottom:2.5px' value='" + city + "'>" + city + "</h1>");
+                $("#cityResults").prepend(cityNewElement);
+                // city is stored under a key named "city" followed by the length of cities stored as a number i.e: "city0"
+                var cityNumber = localStorage.length;
+                var cities = "city" + cityNumber
+                localStorage[cities] = city;
+                location.reload();
             }
             if (city == "") {
                 $(".warning").text("");
@@ -134,15 +143,6 @@
                 searchEmpty.addClass("warning")
                 $(".modal-card-foot").append(searchEmpty);
             }
-            // creates new button element with the city as value
-            var cityNewElement = $("<h1 class='city button column is-light' style='margin-bottom:2.5px' value='" + city + "'>" + city + "</h1>");
-            $("#cityResults").prepend(cityNewElement);
-
-            // city is stored under a key named "city" followed by the length of cities stored as a number i.e: "city0"
-            var cityNumber = localStorage.length;
-            var cities = "city" + cityNumber
-            localStorage[cities] = city;
-            
         });
         
         $(".delete").on("click", function(){
@@ -157,6 +157,7 @@
 
         $(".city").on("click",function(event){
             event.preventDefault();
+            $(".newCityName").empty();
 
             var cityQ = $(this).text();
             var queryURL = "https://api.openweathermap.org/data/2.5/forecast?q="+ cityQ +"&appid=717dd06b31c62671b1b64ddb918b4117";
@@ -167,7 +168,47 @@
             }).then(function(weatherResults){
                 console.log(queryURL);
                 console.log(weatherResults);
-            })
+                
+                var cityUl = $("<ul>");
+
+                var name = weatherResults.city.name;
+                var nameEl = $("<li class='title is-4'>" + name + "</li>");
+                var temp = weatherResults.list[0].main.temp;
+                temp = Math.trunc((temp-273.15) * 9/5 + 32);
+                var tempEl = $("<li>Temperature: " + temp + "°F</li>");
+                var humidity = weatherResults.list[0].main.humidity;
+                var humiEl = $("<li>Humidity: " + humidity + "%</li>");
+                var windS = weatherResults.list[0].wind.speed;
+                var windEl = $("<li>Wind Speed: " + windS + "MPH</li>");
+
+                cityUl.append(nameEl);
+                cityUl.append(tempEl);
+                cityUl.append(humiEl);
+                cityUl.append(windEl);
+                
+                var lat = weatherResults.city.coord.lat;
+                var lon = weatherResults.city.coord.lon;
+                var uvURL = "http://api.openweathermap.org/data/2.5/uvi?lat=" + lat + "&lon=" + lon + "&appid=717dd06b31c62671b1b64ddb918b4117"
+                console.log(uvURL);
+
+                $.ajax({
+                    url: uvURL,
+                    method: "GET"
+                }).then(function(uvIndex){
+                    console.log(uvIndex)
+
+                    var uvIndexVal = uvIndex.value;
+                    var uvEl = $("<li>UV Index: " + uvIndexVal + "</li>");
+                    cityUl.append(uvEl);
+                })
+
+                $(".newCityName").append(cityUl);
+
+            }); 
+                
+
+                
+
         })
 
     });
