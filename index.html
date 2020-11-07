@@ -38,30 +38,34 @@
 
             </div>
         </div>
-        <div class="column  is-vertical is-9">
+        <div class="column is-vertical is-9">
             <div class="card">
                 <div class="card-content">
                     <h1 class="title" id="currentDay"></h1>
                     <h1 class="subtitle is-4" id="currentTime"></h1>
                     <div class="newCityName"></div>
                 </div>
+                
                 <footer class="card-footer">
                     <!-- create divs and data with jQuery? -->
-                    <div class="card-footer-item" id="day1">
-                        
-                    </div>
-                    <div class="card-footer-item" id="day2">
-                        
-                    </div>
-
-                    <div class="card-footer-item" id="day3">
-                        
-                    </div>
-                    <div class="card-footer-item" id="day4">
-                        
-                    </div>
-                    <div class="card-footer-item" id="day5">
-                        
+                    <div class="tile is-ancestor">
+                        <div class="tile">
+                            <div class="tile is-parent is-vertical">
+                                <article class="tile is-child box" id="day1" style="text-align: center;"></article>
+                            </div>    
+                            <div class="tile is-parent is-vertical">
+                                <article class="tile is-child box" id="day2" style="text-align: center;"></article>
+                            </div>    
+                            <div class="tile is-parent is-vertical">
+                                <article class="tile is-child box" id="day3" style="text-align: center;"></article>
+                            </div>    
+                            <div class="tile is-parent is-vertical">
+                                <article class="tile is-child box" id="day4" style="text-align: center;"></article>
+                            </div>    
+                            <div class="tile is-parent is-vertical">
+                                <article class="tile is-child box" id="day5" style="text-align: center;"></article>
+                            </div>
+                        </div>   
                     </div>
                 </footer>
             </div>
@@ -158,7 +162,12 @@
         $(".city").on("click",function(event){
             event.preventDefault();
             $(".newCityName").empty();
-
+            $("#day1").empty();
+            $("#day2").empty();
+            $("#day3").empty();
+            $("#day4").empty();
+            $("#day5").empty();
+            
             var cityQ = $(this).text();
             var queryURL = "https://api.openweathermap.org/data/2.5/forecast?q="+ cityQ +"&appid=717dd06b31c62671b1b64ddb918b4117";
 
@@ -166,13 +175,13 @@
                 url: queryURL,
                 method: "GET"
             }).then(function(weatherResults){
-                console.log(queryURL);
+                // console.log(queryURL);
                 console.log(weatherResults);
                 
                 var cityUl = $("<ul>");
 
                 var name = weatherResults.city.name;
-                var nameEl = $("<li class='title is-4'>" + name + "</li>");
+                var nameEl = $("<li class='title is-3'>" + name + "</li>");
                 var temp = weatherResults.list[0].main.temp;
                 temp = Math.trunc((temp-273.15) * 9/5 + 32);
                 var tempEl = $("<li>Temperature: " + temp + "°F</li>");
@@ -189,20 +198,115 @@
                 var lat = weatherResults.city.coord.lat;
                 var lon = weatherResults.city.coord.lon;
                 var uvURL = "http://api.openweathermap.org/data/2.5/uvi?lat=" + lat + "&lon=" + lon + "&appid=717dd06b31c62671b1b64ddb918b4117"
-                console.log(uvURL);
+                // console.log(uvURL);
 
                 $.ajax({
                     url: uvURL,
                     method: "GET"
                 }).then(function(uvIndex){
-                    console.log(uvIndex)
+                    // console.log(uvIndex)
 
                     var uvIndexVal = uvIndex.value;
                     var uvEl = $("<li>UV Index: " + uvIndexVal + "</li>");
                     cityUl.append(uvEl);
                 })
-
+                // City info is display above 5-da forecast...
                 $(".newCityName").append(cityUl);
+
+                // day 1 card starts here
+                var day1Ul = $("<ul>");
+                var day = weatherResults.list[5].dt_txt.replace('00:00:00', '');
+                var day1El = $("<li  class='subtitle'>"+day+"</li>");
+                var icon = weatherResults.list[5].weather[0].icon;
+                var iconEl = $("<img src='http://openweathermap.org/img/wn/" + icon + "@2x.png'>");
+                var day1Temp = weatherResults.list[0].main.temp;
+                day1Temp = Math.trunc((day1Temp-273.15) * 9/5 + 32);
+                var tempEl1 = $("<li>Temperature: " + day1Temp + "°F</li>");
+                var humidity1 = weatherResults.list[5].main.humidity;
+                var humiEl1 = $("<li>Humidity: " + humidity1 + "%</li>");
+
+                day1Ul.append(day1El);
+                day1Ul.append(iconEl);
+                day1Ul.append(tempEl1);
+                day1Ul.append(humiEl1);
+
+                $("#day1").append(day1Ul);
+
+                // day 2 card starts here    
+                var day2Ul = $("<ul>");
+                var day = weatherResults.list[13].dt_txt.replace('00:00:00', '');
+                var day2El = $("<li  class='subtitle'>"+day+"</li>");
+                var icon2 = weatherResults.list[13].weather[0].icon;
+                var icon2El = $("<img src='http://openweathermap.org/img/wn/" + icon2 + "@2x.png'>");
+                var day2Temp = weatherResults.list[13].main.temp;
+                day2Temp = Math.trunc((day2Temp-273.15) * 9/5 + 32);
+                var tempEl2 = $("<li>Temperature: " + day2Temp + "°F</li>");
+                var humidity2 = weatherResults.list[13].main.humidity;
+                var humiEl2 = $("<li>Humidity: " + humidity2 + "%</li>");
+
+                day2Ul.append(day2El);
+                day2Ul.append(icon2El);
+                day2Ul.append(tempEl2);
+                day2Ul.append(humiEl2);
+
+                $("#day2").append(day2Ul)
+
+                // day 3 card starts here
+                var day3Ul = $("<ul>");
+                var day = weatherResults.list[21].dt_txt.replace('00:00:00', '');
+                var day3El = $("<li  class='subtitle'>"+day+"</li>");
+                var icon3 = weatherResults.list[21].weather[0].icon;
+                var icon3El = $("<img src='http://openweathermap.org/img/wn/" + icon3 + "@2x.png'>");
+                var day3Temp = weatherResults.list[21].main.temp;
+                day3Temp = Math.trunc((day3Temp-273.15) * 9/5 + 32);
+                var tempEl3 = $("<li>Temperature: " + day3Temp + "°F</li>");
+                var humidity3 = weatherResults.list[21].main.humidity;
+                var humiEl3 = $("<li>Humidity: " + humidity3 + "%</li>");
+
+                day3Ul.append(day3El);
+                day3Ul.append(icon3El);
+                day3Ul.append(tempEl3);
+                day3Ul.append(humiEl3);
+
+                $("#day3").append(day3Ul);
+
+                // day 4 card starts here
+                var day4Ul = $("<ul>");
+                var day = weatherResults.list[29].dt_txt.replace('00:00:00', '');
+                var day4El = $("<li  class='subtitle'>"+day+"</li>");
+                var icon4 = weatherResults.list[29].weather[0].icon;
+                var icon4El = $("<img src='http://openweathermap.org/img/wn/" + icon4 + "@2x.png'>");
+                var day4Temp = weatherResults.list[29].main.temp;
+                day4Temp = Math.trunc((day4Temp-273.15) * 9/5 + 32);
+                var tempEl4 = $("<li>Temperature: " + day4Temp + "°F</li>");
+                var humidity4 = weatherResults.list[29].main.humidity;
+                var humiEl4 = $("<li>Humidity: " + humidity4 + "%</li>");
+
+                day4Ul.append(day4El);
+                day4Ul.append(icon4El);
+                day4Ul.append(tempEl4);
+                day4Ul.append(humiEl4);
+
+                $("#day4").append(day4Ul);
+
+                // day 5 card starts here
+                var day5Ul = $("<ul>");
+                var day = weatherResults.list[37].dt_txt.replace('00:00:00', '');
+                var day5El = $("<li  class='subtitle'>"+day+"</li>");
+                var icon5 = weatherResults.list[37].weather[0].icon;
+                var icon5El = $("<img src='http://openweathermap.org/img/wn/" + icon5 + "@2x.png'>");
+                var day5Temp = weatherResults.list[37].main.temp;
+                day5Temp = Math.trunc((day5Temp-273.15) * 9/5 + 32);
+                var tempEl5 = $("<li>Temperature: " + day5Temp + "°F</li>");
+                var humidity5 = weatherResults.list[37].main.humidity;
+                var humiEl5 = $("<li>Humidity: " + humidity5 + "%</li>");
+
+                day5Ul.append(day5El);
+                day5Ul.append(icon5El);
+                day5Ul.append(tempEl5);
+                day5Ul.append(humiEl5);
+
+                $("#day5").append(day5Ul);
 
             }); 
                 
