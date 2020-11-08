@@ -25,14 +25,16 @@
                 <div class="card-content">
                     <h2 class="title" style="text-align: center;">Your Cities</h2>
                     <div class="card-footer-item">
-                        <button class="button is-link" id="newSearchBtn">New Search</button>
+                        <input class="input" placeholder="e.g. Orlando" id="cityValue"></textarea>
+                        <button id="showResults" class="button is-success">Add City!</button><br>
+                        <!-- <button class="button is-link" id="newSearchBtn">New Search</button> -->
                     </div>
+                    <div id="warning-card"></div>
                 </div>
                 <footer class="card-footer">
                     <div id="cityResults" class="column">
                     <!-- search results here -->
-                    
-                    <!-- search results here -->            
+                               
                     </div>
                 </footer>
 
@@ -46,7 +48,7 @@
                     <div class="newCityName"></div>
                 </div>
                 
-                <footer class="card-footer">
+                <footer class="card-footer" style="display: none;">
                     <!-- create divs and data with jQuery? -->
                     <div class="tile is-ancestor">
                         <div class="tile">
@@ -71,22 +73,6 @@
             </div>
         </div>
 </div>
-<!-- MODAL GOES BELOW -->
-<div class="modal">
-    <div class="modal-background"></div>
-    <div class="modal-card">
-      <header class="modal-card-head">
-        <p class="modal-card-title">Enter a city name below</p>
-        <button class="delete" aria-label="close"></button>
-      </header>
-      <section class="modal-card-body">
-        <input type="text" id="cityValue">
-      </section>
-      <footer class="modal-card-foot">
-        <button id="showResults" class="button is-success">Show my results!</button>
-      </footer>
-    </div>
-  </div>
 
 <footer class="footer">
     <div class="content has-text-centered">
@@ -97,70 +83,54 @@
     </div>
   </footer>
 
-    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js"></script>
-    <script>
+<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js"></script>
+<script>
 
     $(document).ready(function(){
             
         $("#currentDay").text(moment().format("dddd, MMMM Do"));
         $("#currentTime").text(moment().format("hh:mm A"));
-        
+        var storage = localStorage;
+        if(storage.length > 0){
+            $(".card-footer").attr("style","display:;");
+            // display weather here?
+        };
+
         //this for loop displays cities searched on main page...
         for (var i = 0; i < localStorage.length; i++){
             var storedCities = "city"+ i;
             var myStoredCity = localStorage.getItem(storedCities);
-            var cityNewElement = $("<h1 class='city button column is-light' style='margin-bottom:2.5px' value='" + myStoredCity + "'>" + myStoredCity + "</h1>");
+            var cityNewElement = $("<h1 class='city button column is-light' style='margin-bottom:3px;' " + myStoredCity + "'>" + myStoredCity + "</h1>");
+            
             $("#cityResults").prepend(cityNewElement);
         }
         
-        // new search button displays modal so user can enter a city...
-        $("#newSearchBtn").on("click", function(){
-
-            $(".modal").attr("style", "display: ;");
-            $(".modal").addClass("is-active");
-            $(".modal").addClass("open"); 
-        });
 
         $("#showResults").on("click", function(){
 
-            // $("#searchBox").attr("display","");
             var city = $("#cityValue").val().trim();//city query goes here...
             
             if (city !== ""){
-                // takes user input and adds it to the URL
-                $(".warning").text("");
-                $(".modal").attr("style", "display: none;");
                 $("#cityValue").val("");
-                // creates new button element with the city as value
-                var cityNewElement = $("<h1 class='city button column is-light' style='margin-bottom:2.5px' value='" + city + "'>" + city + "</h1>");
+                var cityNewElement = $("<h1 class='city button column is-light' style='margin-bottom:3px' value='" + city + "'>" + city + "</h1>");
                 $("#cityResults").prepend(cityNewElement);
-                // city is stored under a key named "city" followed by the length of cities stored as a number i.e: "city0"
                 var cityNumber = localStorage.length;
                 var cities = "city" + cityNumber
                 localStorage[cities] = city;
                 location.reload();
             }
             if (city == "") {
-                $(".warning").text("");
-                var searchEmpty = $("<p>Search box can't be empty</p>")
-                searchEmpty.addClass("warning")
-                $(".modal-card-foot").append(searchEmpty);
+                $(".warning").remove();
+                var searchEmpty = $("<p class='warning column'>Search box can't be empty</p>")
+                $("#warning-card").append(searchEmpty);
             }
         });
         
-        $(".delete").on("click", function(){
-            $(".warning").text("");
-            $(".modal").attr("style", "display: none;");
-            $(".modal").removeClass("open");
-        });
-
-        while ($(".modal").hasClass("open") === true){
-            $(window).on("click", console.log("test"))
-        }
-
         $(".city").on("click",function(event){
             event.preventDefault();
+            $(".warning").remove();
+            $(".card-footer").attr("style", "display:;")
             $(".newCityName").empty();
             $("#day1").empty();
             $("#day2").empty();
@@ -181,7 +151,7 @@
                 var cityUl = $("<ul>");
 
                 var name = weatherResults.city.name;
-                var nameEl = $("<li class='title is-3'>" + name + "</li>");
+                var nameEl = $("<li class='title is-3'>" + name + " <span class='button removeCity is-info is-small'> Remove City</span>" + "</li>");
                 var temp = weatherResults.list[0].main.temp;
                 temp = Math.trunc((temp-273.15) * 9/5 + 32);
                 var tempEl = $("<li>Temperature: " + temp + "°F</li>");
@@ -197,7 +167,7 @@
                 
                 var lat = weatherResults.city.coord.lat;
                 var lon = weatherResults.city.coord.lon;
-                var uvURL = "http://api.openweathermap.org/data/2.5/uvi?lat=" + lat + "&lon=" + lon + "&appid=717dd06b31c62671b1b64ddb918b4117"
+                var uvURL = "https://api.openweathermap.org/data/2.5/uvi?lat=" + lat + "&lon=" + lon + "&appid=717dd06b31c62671b1b64ddb918b4117"
                 // console.log(uvURL);
 
                 $.ajax({
@@ -207,7 +177,15 @@
                     // console.log(uvIndex)
 
                     var uvIndexVal = uvIndex.value;
-                    var uvEl = $("<li>UV Index: " + uvIndexVal + "</li>");
+                    if (uvIndexVal <=2){
+                        var uvEl = $("<li>UV Index: " + "<span class='tag  is-success'>" +  uvIndexVal + "</span>" + "</li>");
+                    }
+                    if (uvIndexVal > 2 && uvIndexVal <= 7){
+                        var uvEl = $("<li>UV Index: " + "<span class='tag  is-warning'>" +  uvIndexVal + "</span>" + "</li>");
+                    }
+                    if (uvIndexVal > 7){
+                        var uvEl = $("<li>UV Index: " + "<span class='tag  is-danger'>" +  uvIndexVal + "</span>" + "</li>");
+                    }
                     cityUl.append(uvEl);
                 })
                 // City info is display above 5-da forecast...
@@ -218,7 +196,7 @@
                 var day = weatherResults.list[5].dt_txt.replace('00:00:00', '');
                 var day1El = $("<li  class='subtitle'>"+day+"</li>");
                 var icon = weatherResults.list[5].weather[0].icon;
-                var iconEl = $("<img src='http://openweathermap.org/img/wn/" + icon + "@2x.png'>");
+                var iconEl = $("<img src='https://openweathermap.org/img/wn/" + icon + "@2x.png'>");
                 var day1Temp = weatherResults.list[0].main.temp;
                 day1Temp = Math.trunc((day1Temp-273.15) * 9/5 + 32);
                 var tempEl1 = $("<li>Temperature: " + day1Temp + "°F</li>");
@@ -237,7 +215,7 @@
                 var day = weatherResults.list[13].dt_txt.replace('00:00:00', '');
                 var day2El = $("<li  class='subtitle'>"+day+"</li>");
                 var icon2 = weatherResults.list[13].weather[0].icon;
-                var icon2El = $("<img src='http://openweathermap.org/img/wn/" + icon2 + "@2x.png'>");
+                var icon2El = $("<img src='https://openweathermap.org/img/wn/" + icon2 + "@2x.png'>");
                 var day2Temp = weatherResults.list[13].main.temp;
                 day2Temp = Math.trunc((day2Temp-273.15) * 9/5 + 32);
                 var tempEl2 = $("<li>Temperature: " + day2Temp + "°F</li>");
@@ -256,7 +234,7 @@
                 var day = weatherResults.list[21].dt_txt.replace('00:00:00', '');
                 var day3El = $("<li  class='subtitle'>"+day+"</li>");
                 var icon3 = weatherResults.list[21].weather[0].icon;
-                var icon3El = $("<img src='http://openweathermap.org/img/wn/" + icon3 + "@2x.png'>");
+                var icon3El = $("<img src='https://openweathermap.org/img/wn/" + icon3 + "@2x.png'>");
                 var day3Temp = weatherResults.list[21].main.temp;
                 day3Temp = Math.trunc((day3Temp-273.15) * 9/5 + 32);
                 var tempEl3 = $("<li>Temperature: " + day3Temp + "°F</li>");
@@ -275,7 +253,7 @@
                 var day = weatherResults.list[29].dt_txt.replace('00:00:00', '');
                 var day4El = $("<li  class='subtitle'>"+day+"</li>");
                 var icon4 = weatherResults.list[29].weather[0].icon;
-                var icon4El = $("<img src='http://openweathermap.org/img/wn/" + icon4 + "@2x.png'>");
+                var icon4El = $("<img src='https://openweathermap.org/img/wn/" + icon4 + "@2x.png'>");
                 var day4Temp = weatherResults.list[29].main.temp;
                 day4Temp = Math.trunc((day4Temp-273.15) * 9/5 + 32);
                 var tempEl4 = $("<li>Temperature: " + day4Temp + "°F</li>");
@@ -294,7 +272,7 @@
                 var day = weatherResults.list[37].dt_txt.replace('00:00:00', '');
                 var day5El = $("<li  class='subtitle'>"+day+"</li>");
                 var icon5 = weatherResults.list[37].weather[0].icon;
-                var icon5El = $("<img src='http://openweathermap.org/img/wn/" + icon5 + "@2x.png'>");
+                var icon5El = $("<img src='https://openweathermap.org/img/wn/" + icon5 + "@2x.png'>");
                 var day5Temp = weatherResults.list[37].main.temp;
                 day5Temp = Math.trunc((day5Temp-273.15) * 9/5 + 32);
                 var tempEl5 = $("<li>Temperature: " + day5Temp + "°F</li>");
