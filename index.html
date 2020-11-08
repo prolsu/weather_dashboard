@@ -48,24 +48,24 @@
                     <div class="newCityName"></div>
                 </div>
                 
-                <footer class="card-footer" style="display: none;">
+                <footer id="forecast" class="card-footer" style="display: none;">
                     <!-- create divs and data with jQuery? -->
                     <div class="tile is-ancestor">
                         <div class="tile">
                             <div class="tile is-parent is-vertical">
-                                <article class="tile is-child box" id="day1" style="text-align: center;"></article>
+                                <article class="dailyFore tile is-child box" id="day1" style="text-align: center;"></article>
                             </div>    
                             <div class="tile is-parent is-vertical">
-                                <article class="tile is-child box" id="day2" style="text-align: center;"></article>
+                                <article class="dailyFore tile is-child box" id="day2" style="text-align: center;"></article>
                             </div>    
                             <div class="tile is-parent is-vertical">
-                                <article class="tile is-child box" id="day3" style="text-align: center;"></article>
+                                <article class="dailyFore tile is-child box" id="day3" style="text-align: center;"></article>
                             </div>    
                             <div class="tile is-parent is-vertical">
-                                <article class="tile is-child box" id="day4" style="text-align: center;"></article>
+                                <article class="dailyFore tile is-child box" id="day4" style="text-align: center;"></article>
                             </div>    
                             <div class="tile is-parent is-vertical">
-                                <article class="tile is-child box" id="day5" style="text-align: center;"></article>
+                                <article class="dailyFore tile is-child box" id="day5" style="text-align: center;"></article>
                             </div>
                         </div>   
                     </div>
@@ -101,7 +101,7 @@
         for (var i = 0; i < localStorage.length; i++){
             var storedCities = "city"+ i;
             var myStoredCity = localStorage.getItem(storedCities);
-            var cityNewElement = $("<h1 class='city button column is-light' style='margin-bottom:3px;' " + myStoredCity + "'>" + myStoredCity + "</h1>");
+            var cityNewElement = $("<h1 class='city button column is-light' style='margin-bottom:3px;' id='" + myStoredCity + "'>" + myStoredCity + "</h1>");
             
             $("#cityResults").prepend(cityNewElement);
         }
@@ -151,7 +151,7 @@
                 var cityUl = $("<ul>");
 
                 var name = weatherResults.city.name;
-                var nameEl = $("<li class='title is-3'>" + name + " <span class='button removeCity is-info is-small'> Remove City</span>" + "</li>");
+                var nameEl = $("<li id='" + storedCities + "' class='title is-3'>" + name + " <span><h1 class='button removeCity is-info is-small'> Remove City</h1></span>" + "</li>");
                 var temp = weatherResults.list[0].main.temp;
                 temp = Math.trunc((temp-273.15) * 9/5 + 32);
                 var tempEl = $("<li>Temperature: " + temp + "°F</li>");
@@ -286,12 +286,26 @@
 
                 $("#day5").append(day5Ul);
 
+                $(".removeCity").on("click", function(){
+                    var cityToRemove = $("span").parent().get(0).id;
+                    console.log(cityToRemove)
+                    localStorage.removeItem(cityToRemove)
+                    $(".newCityName").children().remove();
+                    var fiveDayForecast = $(".dailyFore").children()
+                    for (var i = 0; i < fiveDayForecast.length; i++){
+                        fiveDayForecast[i].remove()
+                    }
+                    location.reload();
+                });
+
             }); 
                 
 
                 
 
         })
+
+        
 
     });
 
