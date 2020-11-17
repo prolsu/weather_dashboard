@@ -91,19 +91,20 @@
             
         $("#currentDay").text(moment().format("dddd, MMMM Do"));
         $("#currentTime").text(moment().format("hh:mm A"));
-        var storage = localStorage;
-        if(storage.length > 0){
-            $(".card-footer").attr("style","display:;");
-            // display weather here?
-        };
+        // var storage = localStorage;
+        // if(storage.length > 0){
+        //     $(".card-footer").attr("style","display:;");
+        //     // display weather here?
+        // };                                          <-----------DELETE
 
         //this for loop displays cities searched on main page...
-        for (var i = 0; i < localStorage.length; i++){
+        for (var i = 0; i < 100; i++){
             var storedCities = "city"+ i;
             var myStoredCity = localStorage.getItem(storedCities);
-            var cityNewElement = $("<h1 class='city button column is-light' style='margin-bottom:3px;' id='" + myStoredCity + "'>" + myStoredCity + "</h1>");
-            
-            $("#cityResults").prepend(cityNewElement);
+            if(myStoredCity != null){
+                var cityNewElement = $("<h1 class='city button column is-light' style='margin-bottom:3px;' id='" + myStoredCity + "'>" + myStoredCity + "</h1>");
+                $("#cityResults").prepend(cityNewElement);
+            }
         }
         
 
@@ -111,14 +112,14 @@
 
             var city = $("#cityValue").val().trim();//city query goes here...
             
-            if (city !== ""){
+            if (city != ""){
                 $("#cityValue").val("");
                 var cityNewElement = $("<h1 class='city button column is-light' style='margin-bottom:3px' value='" + city + "'>" + city + "</h1>");
                 $("#cityResults").prepend(cityNewElement);
                 var cityNumber = localStorage.length;
                 var cities = "city" + cityNumber
                 localStorage[cities] = city;
-                location.reload();
+                // location.reload();
             }
             if (city == "") {
                 $(".warning").remove();
@@ -286,7 +287,7 @@
 
                 $("#day5").append(day5Ul);
 
-                $(".removeCity").on("click", function(){
+                $(this).on("click",removeCity, function(){
                     var cityToRemove = $("span").parent().get(0).id;
                     console.log(cityToRemove)
                     localStorage.removeItem(cityToRemove)
