@@ -53,19 +53,19 @@
                     <div class="tile is-ancestor">
                         <div class="tile">
                             <div class="tile is-parent is-vertical">
-                                <article class="dailyFore tile is-child box" id="day1" style="text-align: center;"></article>
+                                <article class="dailyFore tile is-child box" id="day1" style="text-align: center; background-color: lightblue;"></article>
                             </div>    
                             <div class="tile is-parent is-vertical">
-                                <article class="dailyFore tile is-child box" id="day2" style="text-align: center;"></article>
+                                <article class="dailyFore tile is-child box" id="day2" style="text-align: center; background-color: lightblue;"></article>
                             </div>    
                             <div class="tile is-parent is-vertical">
-                                <article class="dailyFore tile is-child box" id="day3" style="text-align: center;"></article>
+                                <article class="dailyFore tile is-child box" id="day3" style="text-align: center; background-color: lightblue;"></article>
                             </div>    
                             <div class="tile is-parent is-vertical">
-                                <article class="dailyFore tile is-child box" id="day4" style="text-align: center;"></article>
+                                <article class="dailyFore tile is-child box" id="day4" style="text-align: center; background-color: lightblue;"></article>
                             </div>    
                             <div class="tile is-parent is-vertical">
-                                <article class="dailyFore tile is-child box" id="day5" style="text-align: center;"></article>
+                                <article class="dailyFore tile is-child box" id="day5" style="text-align: center; background-color: lightblue;"></article>
                             </div>
                         </div>   
                     </div>
@@ -91,17 +91,13 @@
             
         $("#currentDay").text(moment().format("dddd, MMMM Do"));
         $("#currentTime").text(moment().format("hh:mm A"));
-        // var storage = localStorage;
-        // if(storage.length > 0){
-        //     $(".card-footer").attr("style","display:;");
-        //     // display weather here?
-        // };                                          <-----------DELETE
 
         //this for loop displays cities searched on main page...
-        for (var i = 0; i < 100; i++){
+        
+        for (var i = 0; i <= localStorage.length +100 ; i++){
             var storedCities = "city"+ i;
             var myStoredCity = localStorage.getItem(storedCities);
-            if(myStoredCity != null){
+            if(myStoredCity !== null){
                 var cityNewElement = $("<h1 class='city button column is-light' style='margin-bottom:3px;' id='" + myStoredCity + "'>" + myStoredCity + "</h1>");
                 $("#cityResults").prepend(cityNewElement);
             }
@@ -110,16 +106,21 @@
 
         $("#showResults").on("click", function(){
 
-            var city = $("#cityValue").val().trim();//city query goes here...
+            var city = $("#cityValue").val().trim().toUpperCase();//city query goes here...
             
-            if (city != ""){
+            if (city !== ""){
+                
                 $("#cityValue").val("");
                 var cityNewElement = $("<h1 class='city button column is-light' style='margin-bottom:3px' value='" + city + "'>" + city + "</h1>");
                 $("#cityResults").prepend(cityNewElement);
                 var cityNumber = localStorage.length;
-                var cities = "city" + cityNumber
-                localStorage[cities] = city;
-                // location.reload();
+                var cities = "city" + cityNumber;
+                if(localStorage.getItem(cities) != ""){
+                    cityNumber += 1
+                    cities = "city" + cityNumber
+                    localStorage[cities] = city;
+                    location.reload();
+                }
             }
             if (city == "") {
                 $(".warning").remove();
@@ -151,8 +152,8 @@
                 
                 var cityUl = $("<ul>");
 
-                var name = weatherResults.city.name;
-                var nameEl = $("<li id='" + storedCities + "' class='title is-3'>" + name + " <span><h1 class='button removeCity is-info is-small'> Remove City</h1></span>" + "</li>");
+                var name = weatherResults.city.name.toUpperCase();
+                var nameEl = $("<li id='" + name + "' class='title is-2'>" + name + "</li>" + "<button class='button removeCity is-info is-small' style='bottom:15px;'> Remove City</button>");
                 var temp = weatherResults.list[0].main.temp;
                 temp = Math.trunc((temp-273.15) * 9/5 + 32);
                 var tempEl = $("<li>Temperature: " + temp + "°F</li>");
@@ -287,26 +288,26 @@
 
                 $("#day5").append(day5Ul);
 
-                $(this).on("click",removeCity, function(){
-                    var cityToRemove = $("span").parent().get(0).id;
-                    console.log(cityToRemove)
-                    localStorage.removeItem(cityToRemove)
-                    $(".newCityName").children().remove();
-                    var fiveDayForecast = $(".dailyFore").children()
-                    for (var i = 0; i < fiveDayForecast.length; i++){
-                        fiveDayForecast[i].remove()
+                $(".removeCity").on("click", function(){
+                    
+                    var cityToRemove = $(this).prev().get(0).id;
+                    
+                    for (var q = 0; q < localStorage.length * 10; q++){
+                        var storedCities2 = "city"+ q;
+                        var myStoredCity2 = localStorage.getItem(storedCities2);
+                        if(storedCities2 != null && myStoredCity2 === cityToRemove){
+                            console.log(storedCities2);
+                            console.log(cityToRemove);
+                            localStorage.removeItem(storedCities2);
+                        }
                     }
+
                     location.reload();
                 });
-
+                
             }); 
-                
-
-                
 
         })
-
-        
 
     });
 
